@@ -27,5 +27,7 @@ class UserDetail(generics.RetrieveAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
 
-
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
