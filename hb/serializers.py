@@ -25,3 +25,23 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'  
+
+class UserFavoritePlantsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserFavoritePlants
+        fields = '__all__'
+        
+class UserNotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserNotification
+        fields = '__all__'
+        
+class CommunityPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommunityPost
+        fields = '__all__'
+
+class PlantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Plant
+        fields = '__all__'
