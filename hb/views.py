@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import action, api_view
 from .models import *
 from .serializers import *
+from corsheaders.middleware import CorsMiddleware
 
 class PlantListViewSet(viewsets.ModelViewSet):
     queryset = Plant.objects.all()
