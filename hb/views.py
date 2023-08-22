@@ -20,7 +20,7 @@ class PlantDetail(viewsets.ModelViewSet):
 
 class UserCreateViewSet(APIView):
     permission_classes = (permissions.AllowAny,)
-    authentication_classes = ()
+    # authentication_classes = ()
     
     def post(self, request, format='json'):
         serializer = CustomUserSerializer(data=request.data)

@@ -89,7 +89,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'api',
-    'hb'
+    'hb.apps.HbConfig',
 ]
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
