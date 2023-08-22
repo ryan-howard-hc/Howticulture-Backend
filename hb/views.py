@@ -9,11 +9,15 @@ from rest_framework.decorators import action, api_view
 from .models import *
 from .serializers import *
 
-class PlantList(viewsets.ModelViewSet):
+class PlantListViewSet(viewsets.ModelViewSet):
     queryset = Plant.objects.all()
     serializer_class = PlantSerializer
 
-class UserCreate(APIView):
+class PlantDetail(viewsets.ModelViewSet):
+    queryset = Plant.objects.all().order_by('id')
+    serializer_class = PlantSerializer
+
+class UserCreateViewSet(APIView):
     permission_classes = (permissions.AllowAny,)
     authentication_classes = ()
     
@@ -22,27 +26,28 @@ class UserCreate(APIView):
         if serializer.is_valid():
             user = serializer.save()
             if user:
-                json = serializer.data
+                json = serializer.data 
                 return Response(json, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class UserDetail(generics.RetrieveAPIView):
+
+class UserDetailViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
 
-class UserViewSet(viewsets.ModelViewSet):
+class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-class UserFavoritePlantsList(viewsets.ModelViewSet):
+class UserFavoritePlantsListViewSet(viewsets.ModelViewSet):
     queryset = UserFavoritePlants.objects.all()
     serializer_class = UserFavoritePlantsSerializer
 
-class UserNotificationList(viewsets.ModelViewSet):
+class UserNotificationListViewSet(viewsets.ModelViewSet):
     queryset = UserNotification.objects.all()
     serializer_class = UserNotificationSerializer
 
-class CommunityPostList(viewsets.ModelViewSet):
+class CommunityPostListViewSet(viewsets.ModelViewSet):
     queryset = CommunityPost.objects.all()
     serializer_class = CommunityPostSerializer
