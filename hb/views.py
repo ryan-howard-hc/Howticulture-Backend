@@ -52,3 +52,11 @@ class UserNotificationListViewSet(viewsets.ModelViewSet):
 class CommunityPostListViewSet(viewsets.ModelViewSet):
     queryset = CommunityPost.objects.all()
     serializer_class = CommunityPostSerializer
+
+    @action(detail=False, methods=['post'])
+    def create_post(self, request):
+        serializer = CommunityPostCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)  # Assuming you have user authentication
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
