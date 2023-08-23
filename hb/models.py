@@ -63,6 +63,8 @@ class UserNotification(models.Model):
     
 class CommunityPost(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=50)
     content = models.TextField()
+    image_url = models.CharField(max_length=255, null=True, blank=True)  
+
     created_at = models.DateTimeField(auto_now_add=True)

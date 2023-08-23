@@ -20,6 +20,4 @@ urlpatterns = [
     path('user-favorite-plants/<int:pk>/', UserFavoritePlantsListViewSet.as_view({'get': 'list'}), name="user_favorite_plants_detail"),  # Example: /user-favorite-plants/1/
     path('user-notifications/<int:pk>/', UserNotificationListViewSet.as_view({'get': 'list'}), name="user_notification_detail"),  # Example: /user-notifications/1/
     path('community-posts/<int:pk>/', CommunityPostListViewSet.as_view({'get': 'list'}), name="community_post_detail"),  # Example: /community-posts/1/
-    path('community-posts/create/', CommunityPostListViewSet.as_view({'post': 'create_post'}), name='create_community_post'),
-
 ]
