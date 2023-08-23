@@ -2,13 +2,14 @@ from django.urls import path, include
 from rest_framework_simplejwt import views as jwt_views
 from rest_framework import routers
 from .views import *
+from . import views
 
 router = routers.DefaultRouter()
 router.register(r'users', UsersViewSet)
 router.register(r'plants', PlantListViewSet)
 router.register(r'user-favorite-plants', UserFavoritePlantsListViewSet)
 router.register(r'user-notifications', UserNotificationListViewSet)
-router.register(r'community-posts', CommunityPostListViewSet)
+# router.register(r'community-posts', CommunityPostListViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -19,5 +20,7 @@ urlpatterns = [
     path('plant/<int:pk>/', PlantDetail.as_view({'get': 'list'}), name="plant_detail"),  # Example: /plant/1/
     path('user-favorite-plants/<int:pk>/', UserFavoritePlantsListViewSet.as_view({'get': 'list'}), name="user_favorite_plants_detail"),  # Example: /user-favorite-plants/1/
     path('user-notifications/<int:pk>/', UserNotificationListViewSet.as_view({'get': 'list'}), name="user_notification_detail"),  # Example: /user-notifications/1/
-    path('community-posts/<int:pk>/', CommunityPostListViewSet.as_view({'get': 'list'}), name="community_post_detail"),  # Example: /community-posts/1/
+    # path('community-posts/<int:pk>/', CommunityPostListViewSet.create), 
+    path('community-posts/',views.createPost), 
+
 ]

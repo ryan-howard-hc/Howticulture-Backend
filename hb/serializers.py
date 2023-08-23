@@ -1,6 +1,10 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from .models import *
+from django.shortcuts import render
+from django.http import HttpResponse, JsonResponse
+import requests
+import json
 
 class CustomUserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(

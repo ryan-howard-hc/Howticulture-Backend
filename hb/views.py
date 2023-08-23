@@ -51,4 +51,11 @@ class UserNotificationListViewSet(viewsets.ModelViewSet):
 
 class CommunityPostListViewSet(viewsets.ModelViewSet):
     queryset = CommunityPost.objects.all()
-    serializer_class = CommunityPostSerializer
+    
+@api_view([ 'POST'])
+def createPost(request):
+    print(request)
+    serializer = CommunityPostSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.save()
+        return Response(serializer.data) 
