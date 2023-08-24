@@ -208,11 +208,13 @@ SIMPLE_JWT = {
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.0/howto/static-files/
-STATIC_ROOT = "static"
-STATIC_URL = "/static/"
-STATICFILES_DIRS = []
+STATIC_URL = '/static/'
+
+# Define the directory where your static files are stored
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+# Define the directory where the collected static files will be stored
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
 
 
 AUTH_USER_MODEL = 'hb.CustomUser'

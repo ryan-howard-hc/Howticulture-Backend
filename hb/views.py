@@ -51,24 +51,26 @@ class UserFavoritePlantsListViewSet(viewsets.ModelViewSet):
     serializer_class = UserFavoritePlantsSerializer
     @action(detail=True, methods=['post'])
     def add_favorite_plant(self, request, pk=None):
-        # Assuming you're passing the plant ID in the request data as 'plant_id'
-        plant_id = request.data.get('plant_id')
-        user = self.get_object()  # Get the user based on the user ID in the URL
-        
         try:
-            # Check if the user already has this plant in favorites
-            existing_favorite = UserFavoritePlants.objects.filter(user=user, plant_id=plant_id).exists()
+            user = self.get_object()  # Get the user based on the user ID in the URL
+            slug = request.data.get('slug')
+
+        # Retrieve the plant based on the slug
+            plant = Plant.objects.get(slug=slug)
+
+        # Check if the plant already exists in favorites
+            existing_favorite = UserFavoritePlants.objects.filter(user=user, plant=plant).first()
 
             if existing_favorite:
-                return Response({'message': 'Plant is already in favorites.'}, status=400)
+                return Response({"detail": "Plant already in favorites."}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Create a new UserFavoritePlants instance
-            favorite_plant = UserFavoritePlants(user=user, plant_id=plant_id)
-            favorite_plant.save()
+        # Create a new UserFavoritePlants entry
+            user_favorite_plant = UserFavoritePlants(user=user, plant=plant)
+            user_favorite_plant.save()
 
-            return Response({'message': 'Plant added to favorites successfully'}, status=201)
+            return Response({"detail": "Plant added to favorites."}, status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response({'message': 'Failed to add plant to favorites.', 'error': str(e)}, status=500)
+            return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class UserNotificationListViewSet(viewsets.ModelViewSet):
     queryset = UserNotification.objects.all()
@@ -77,6 +79,17 @@ class UserNotificationListViewSet(viewsets.ModelViewSet):
 class CommunityPostListViewSet(viewsets.ModelViewSet):
     queryset = CommunityPost.objects.all()
     serializer_class = CommunityPostSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = CommunityPostSerializer(queryset, many=True, context={'request': request})
+        data = serializer.data
+
+        # Add image URLs to the response data
+        for item in data:
+            item['image_url'] = request.build_absolute_uri(item['image'])
+
+        return Response(data)
 
 @api_view([ 'POST'])
 @authentication_classes([])
@@ -89,45 +102,6 @@ def createPost(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-# @api_view(['POST'])
-# @authentication_classes([])
-# @permission_classes([])
-# def createCommunityPost(request):
-#     serializer = CommunityPostSerializer(data=request.data, context={'request': request})
-
-#     if serializer.is_valid():
-#         # Get the user from the request
-#         user = request.user
-
-#         # Check if the user is authenticated
-#         if user.is_authenticated:
-#             serializer.save(user=user)
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         else:
-#             return Response({'detail': 'User is not authenticated.'}, status=status.HTTP_401_UNAUTHORIZED)
-#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#     @api_view(['POST'])
-# @authentication_classes([TokenAuthentication])  # Use TokenAuthentication for token-based auth
-# @permission_classes([IsAuthenticated])  # Use IsAuthenticated to require authentication
-# def createCommunityPost(request):
-#     # The user object is accessible via request.user if authenticated
-#     user = request.user
-
-#     # You can also access the Authorization header to extract the token
-#     authorization_header = request.META.get('HTTP_AUTHORIZATION')
-
-#     if user.is_authenticated:
-#         # Access token successfully extracted and user is authenticated
-#         serializer = CommunityPostSerializer(data=request.data, context={'request': request})
-#         if serializer.is_valid():
-#             serializer.save(user=user)
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         else:
-#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#     else:
-#         return Response({'detail': 'User is not authenticated.'}, status=status.HTTP_401_UNAUTHORIZED)
      
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -139,12 +113,6 @@ def createCommunityPost(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# @require_POST
-# def upload_file(request):
-#     file = request.FILES['file']
-#     with open('path/to/file', 'wb') as f:
-#         f.write(file.read())
-#     return HttpResponse('File uploaded successfully.')
 
 
 @api_view(['POST'])
