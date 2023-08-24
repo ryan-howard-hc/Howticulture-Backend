@@ -207,6 +207,7 @@ STATIC_ROOT = "static"
 STATIC_URL = "/static/"
 STATICFILES_DIRS = []
 
+
 AUTH_USER_MODEL = 'hb.CustomUser'
 
 TREFLE_API_TOKEN = os.environ.get('eYAFPMrYTYRUvLTle8cNaBjynNmAeqmcfI-iNDcfwMI')

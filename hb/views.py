@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser
+
 
 from .models import *
 from .serializers import *
@@ -75,6 +77,7 @@ class UserNotificationListViewSet(viewsets.ModelViewSet):
 class CommunityPostListViewSet(viewsets.ModelViewSet):
     queryset = CommunityPost.objects.all()
     serializer_class = CommunityPostSerializer
+
 @api_view([ 'POST'])
 def createPost(request):
     print(request)
@@ -83,7 +86,17 @@ def createPost(request):
         user = serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+     
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def createCommunityPost(request):
+    serializer = CommunityPostSerializer(data=request.data, context={'request': request})
+
+    if serializer.is_valid():
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 # @require_POST
 # def upload_file(request):
 #     file = request.FILES['file']
@@ -91,8 +104,9 @@ def createPost(request):
 #         f.write(file.read())
 #     return HttpResponse('File uploaded successfully.')
 
+
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def add_favorite_plant(request):
     try:
         user = request.user

@@ -66,6 +66,6 @@ class CommunityPost(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     content = models.TextField()
-    image_url = models.CharField(max_length=500, null=True, blank=True)  
+    image = models.ImageField(upload_to='community_posts/', null=True, blank=True)  # Keep the field name as 'image_url'
 
     created_at = models.DateTimeField(auto_now_add=True)
