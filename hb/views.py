@@ -52,7 +52,7 @@ class UserNotificationListViewSet(viewsets.ModelViewSet):
 
 class CommunityPostListViewSet(viewsets.ModelViewSet):
     queryset = CommunityPost.objects.all()
-    
+    serializer_class = CommunityPostSerializer
 @api_view([ 'POST'])
 def createPost(request):
     print(request)
@@ -63,10 +63,7 @@ def createPost(request):
 
 @require_POST
 def upload_file(request):
-    # Get the file from the request
     file = request.FILES['file']
-    # Save the file to a location
     with open('path/to/file', 'wb') as f:
         f.write(file.read())
-    # Return a success response
     return HttpResponse('File uploaded successfully.')
