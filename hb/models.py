@@ -55,6 +55,7 @@ class User(models.Model):
 class UserFavoritePlants(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     plant = models.ForeignKey(Plant, on_delete=models.CASCADE)
+ 
     
 class UserNotification(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)

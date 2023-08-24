@@ -47,6 +47,26 @@ class UsersViewSet(viewsets.ModelViewSet):
 class UserFavoritePlantsListViewSet(viewsets.ModelViewSet):
     queryset = UserFavoritePlants.objects.all()
     serializer_class = UserFavoritePlantsSerializer
+    @action(detail=True, methods=['post'])
+    def add_favorite_plant(self, request, pk=None):
+        # Assuming you're passing the plant ID in the request data as 'plant_id'
+        plant_id = request.data.get('plant_id')
+        user = self.get_object()  # Get the user based on the user ID in the URL
+        
+        try:
+            # Check if the user already has this plant in favorites
+            existing_favorite = UserFavoritePlants.objects.filter(user=user, plant_id=plant_id).exists()
+
+            if existing_favorite:
+                return Response({'message': 'Plant is already in favorites.'}, status=400)
+
+            # Create a new UserFavoritePlants instance
+            favorite_plant = UserFavoritePlants(user=user, plant_id=plant_id)
+            favorite_plant.save()
+
+            return Response({'message': 'Plant added to favorites successfully'}, status=201)
+        except Exception as e:
+            return Response({'message': 'Failed to add plant to favorites.', 'error': str(e)}, status=500)
 
 class UserNotificationListViewSet(viewsets.ModelViewSet):
     queryset = UserNotification.objects.all()

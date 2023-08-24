@@ -20,7 +20,8 @@ urlpatterns = [
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     path('plant/<int:pk>/', PlantDetail.as_view({'get': 'list'}), name="plant_detail"), 
     path('user-favorite-plants/<int:pk>/', UserFavoritePlantsListViewSet.as_view({'get': 'list'}), name="user_favorite_plants_detail"), 
-    path('api/add-favorite-plant/', add_favorite_plant, name='add_favorite_plant'),
+    
+    path('user-favorite-plants/<int:pk>/add-favorite-plant/', UserFavoritePlantsListViewSet.as_view({'post': 'add_favorite_plant'}), name="add_favorite_plant"),
 
     # path('user-notifications/<int:pk>/', UserNotificationListViewSet.as_view({'get': 'list'}), name="user_notification_detail"),  # Example: /user-notifications/1/
     path('community-posts/<int:pk>/', CommunityPostListViewSet.as_view({'get':'list'})), 
