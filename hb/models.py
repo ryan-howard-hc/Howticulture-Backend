@@ -18,7 +18,7 @@ class Plant(models.Model):
     family_common_name = models.CharField(max_length=100)
     genus_id = models.PositiveIntegerField()
     observations = models.TextField(blank=True)
-    vegetable = models.BooleanField(default=False)
+    # vegetable = models.BooleanField(default=False)
     image_url = models.URLField(max_length=200, blank=True)
     genus = models.CharField(max_length=100)
     family = models.CharField(max_length=100)

@@ -9,6 +9,7 @@ from rest_framework.decorators import action, api_view
 from .models import *
 from .serializers import *
 from corsheaders.middleware import CorsMiddleware
+from django.views.decorators.http import require_POST
 
 class PlantListViewSet(viewsets.ModelViewSet):
     queryset = Plant.objects.all()
@@ -59,3 +60,13 @@ def createPost(request):
     if serializer.is_valid():
         user = serializer.save()
         return Response(serializer.data) 
+
+@require_POST
+def upload_file(request):
+    # Get the file from the request
+    file = request.FILES['file']
+    # Save the file to a location
+    with open('path/to/file', 'wb') as f:
+        f.write(file.read())
+    # Return a success response
+    return HttpResponse('File uploaded successfully.')

@@ -13,13 +13,14 @@ router.register(r'user-notifications', UserNotificationListViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('user/<int:pk>/', UserDetailViewSet.as_view({'get': 'retrieve'}), name="user_detail"),  # Example: /user/1/
+
     path('user/signup/', UserCreateViewSet.as_view(), name="create_user"),
     path('user/login/', jwt_views.TokenObtainPairView.as_view(), name='token_create'),
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
-    path('user/<int:pk>/', UserDetailViewSet.as_view({'get': 'list'}), name="user_detail"),  # Example: /user/1/
-    path('plant/<int:pk>/', PlantDetail.as_view({'get': 'list'}), name="plant_detail"),  # Example: /plant/1/
-    path('user-favorite-plants/<int:pk>/', UserFavoritePlantsListViewSet.as_view({'get': 'list'}), name="user_favorite_plants_detail"),  # Example: /user-favorite-plants/1/
-    path('user-notifications/<int:pk>/', UserNotificationListViewSet.as_view({'get': 'list'}), name="user_notification_detail"),  # Example: /user-notifications/1/
+    path('plant/<int:pk>/', PlantDetail.as_view({'get': 'list'}), name="plant_detail"), 
+    # path('user-favorite-plants/<int:pk>/', UserFavoritePlantsListViewSet.as_view({'get': 'list'}), name="user_favorite_plants_detail"),  # Example: /user-favorite-plants/1/
+    # path('user-notifications/<int:pk>/', UserNotificationListViewSet.as_view({'get': 'list'}), name="user_notification_detail"),  # Example: /user-notifications/1/
     # path('community-posts/<int:pk>/', CommunityPostListViewSet.create), 
     path('community-posts/',views.createPost), 
 
