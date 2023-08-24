@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import status, permissions, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser
 
@@ -79,13 +79,55 @@ class CommunityPostListViewSet(viewsets.ModelViewSet):
     serializer_class = CommunityPostSerializer
 
 @api_view([ 'POST'])
+@authentication_classes([])
 def createPost(request):
     print(request)
     serializer = CommunityPostSerializer(data=request.data)
     if serializer.is_valid():
+        user = self.request.user
         user = serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# @api_view(['POST'])
+# @authentication_classes([])
+# @permission_classes([])
+# def createCommunityPost(request):
+#     serializer = CommunityPostSerializer(data=request.data, context={'request': request})
+
+#     if serializer.is_valid():
+#         # Get the user from the request
+#         user = request.user
+
+#         # Check if the user is authenticated
+#         if user.is_authenticated:
+#             serializer.save(user=user)
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         else:
+#             return Response({'detail': 'User is not authenticated.'}, status=status.HTTP_401_UNAUTHORIZED)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#     @api_view(['POST'])
+# @authentication_classes([TokenAuthentication])  # Use TokenAuthentication for token-based auth
+# @permission_classes([IsAuthenticated])  # Use IsAuthenticated to require authentication
+# def createCommunityPost(request):
+#     # The user object is accessible via request.user if authenticated
+#     user = request.user
+
+#     # You can also access the Authorization header to extract the token
+#     authorization_header = request.META.get('HTTP_AUTHORIZATION')
+
+#     if user.is_authenticated:
+#         # Access token successfully extracted and user is authenticated
+#         serializer = CommunityPostSerializer(data=request.data, context={'request': request})
+#         if serializer.is_valid():
+#             serializer.save(user=user)
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         else:
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     else:
+#         return Response({'detail': 'User is not authenticated.'}, status=status.HTTP_401_UNAUTHORIZED)
      
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
