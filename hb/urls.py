@@ -9,7 +9,6 @@ router = routers.DefaultRouter()
 router.register(r'users', UsersViewSet)
 router.register(r'plants', PlantListViewSet)
 router.register(r'user-favorite-plants', UserFavoritePlantsListViewSet)
-router.register(r'user-notifications', UserNotificationListViewSet)
 router.register(r'community-posts', CommunityPostListViewSet)
 
 urlpatterns = [
@@ -24,7 +23,6 @@ urlpatterns = [
     
     path('user-favorite-plants/<int:pk>/add-favorite-plant/', UserFavoritePlantsListViewSet.as_view({'post': 'add_favorite_plant'}), name="add_favorite_plant"),
 
-    # path('user-notifications/<int:pk>/', UserNotificationListViewSet.as_view({'get': 'list'}), name="user_notification_detail"),  # Example: /user-notifications/1/
     path('community-posts/<int:pk>/', CommunityPostListViewSet.as_view({'get':'list'})), 
     path('create-community-posts/',views.createCommunityPost), 
     path('api/save-slug/', save_slug, name='save_slug'),

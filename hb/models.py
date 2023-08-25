@@ -58,11 +58,6 @@ class UserFavoritePlants(models.Model):
     plant = models.ForeignKey(Plant, on_delete=models.CASCADE)
  
     
-class UserNotification(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    message = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    
 class CommunityPost(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
