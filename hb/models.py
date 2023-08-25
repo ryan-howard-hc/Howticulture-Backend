@@ -8,7 +8,7 @@ class CustomUser(AbstractUser):
 #---------------------------------------
 
 class Plant(models.Model):
-    slug = models.PositiveIntegerField(unique=True)
+    slug = models.CharField(max_length=255, blank=True, null=True)
     trefle_id = models.PositiveIntegerField(unique=True)
     common_name = models.CharField(max_length=100, blank=True)
     scientific_name = models.CharField(max_length=100)

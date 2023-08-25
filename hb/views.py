@@ -136,3 +136,19 @@ def add_favorite_plant(request):
         return Response({"detail": "Plant added to favorites."}, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def save_slug(request):
+    if request.method == 'POST':
+        slug = request.data.get('slug')
+
+        if slug:
+            # You can save the slug to the database here, for example:
+            # plant = Plant.objects.get(slug=slug)
+            # plant.slug = slug
+            # plant.save()
+
+            return Response({'detail': 'Slug saved successfully.'}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'detail': 'Slug is missing from the request data.'}, status=status.HTTP_400_BAD_REQUEST)
