@@ -7,7 +7,6 @@ from django.conf.urls.static import static
 
 router = routers.DefaultRouter()
 router.register(r'users', UsersViewSet)
-router.register(r'plants', PlantListViewSet)
 router.register(r'user-favorite-plants', UserFavoritePlantsListViewSet)
 router.register(r'community-posts', CommunityPostListViewSet)
 
@@ -18,7 +17,6 @@ urlpatterns = [
     path('user/signup/', UserCreateViewSet.as_view(), name="create_user"),
     path('user/login/', jwt_views.TokenObtainPairView.as_view(), name='token_create'),
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
-    path('plant/<int:pk>/', PlantDetail.as_view({'get': 'list'}), name="plant_detail"), 
     path('user-favorite-plants/<int:pk>/', UserFavoritePlantsListViewSet.as_view({'get': 'list'}), name="user_favorite_plants_detail"), 
     
     path('user-favorite-plants/<int:pk>/add-favorite-plant/', UserFavoritePlantsListViewSet.as_view({'post': 'add_favorite_plant'}), name="add_favorite_plant"),

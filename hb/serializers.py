@@ -45,8 +45,3 @@ class CommunityPostCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommunityPost
         fields = '__all__'
-
-class PlantSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Plant
-        fields = '__all__'

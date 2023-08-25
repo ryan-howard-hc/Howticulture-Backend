@@ -15,13 +15,6 @@ from .serializers import *
 from corsheaders.middleware import CorsMiddleware
 from django.views.decorators.http import require_POST
 
-class PlantListViewSet(viewsets.ModelViewSet):
-    queryset = Plant.objects.all()
-    serializer_class = PlantSerializer
-
-class PlantDetail(viewsets.ModelViewSet):
-    queryset = Plant.objects.all().order_by('id')
-    serializer_class = PlantSerializer
 
 class UserCreateViewSet(APIView):
     permission_classes = (permissions.AllowAny,)
@@ -55,16 +48,12 @@ class UserFavoritePlantsListViewSet(viewsets.ModelViewSet):
             user = self.get_object()  # Get the user based on the user ID in the URL
             slug = request.data.get('slug')
 
-        # Retrieve the plant based on the slug
             plant = Plant.objects.get(slug=slug)
 
-        # Check if the plant already exists in favorites
             existing_favorite = UserFavoritePlants.objects.filter(user=user, plant=plant).first()
 
             if existing_favorite:
                 return Response({"detail": "Plant already in favorites."}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Create a new UserFavoritePlants entry
             user_favorite_plant = UserFavoritePlants(user=user, plant=plant)
             user_favorite_plant.save()
 
