@@ -211,11 +211,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATIC_URL = '/static/'
 
 # Define the directory where your static files are stored
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),
+    "/workspace/Howticulture-Backend/static",
+]
 
 # Define the directory where the collected static files will be stored
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
-
+# MEDIA_URL = '/community_posts/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'community_posts')
+MEDIA_URL = '/media/'
 
 AUTH_USER_MODEL = 'hb.CustomUser'
 

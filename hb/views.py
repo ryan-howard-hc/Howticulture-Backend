@@ -1,19 +1,18 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
-from rest_framework import viewsets
+from rest_framework import viewsets, serializers
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import status, permissions, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
+from rest_framework.decorators import action, api_view, permission_classes, authentication_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.parsers import MultiPartParser
-
-
+from rest_framework.parsers import MultiPartParser, FormParser
 from .models import *
 from .serializers import *
 from corsheaders.middleware import CorsMiddleware
 from django.views.decorators.http import require_POST
+from django.conf import settings 
 
 
 class UserCreateViewSet(APIView):
@@ -45,7 +44,7 @@ class UserFavoritePlantsListViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def add_favorite_plant(self, request, pk=None):
         try:
-            user = self.get_object()  # Get the user based on the user ID in the URL
+            user = self.get_object() 
             slug = request.data.get('slug')
 
             plant = Plant.objects.get(slug=slug)
@@ -72,33 +71,63 @@ class CommunityPostListViewSet(viewsets.ModelViewSet):
         serializer = CommunityPostSerializer(queryset, many=True, context={'request': request})
         data = serializer.data
 
-        # Add image URLs to the response data
         for item in data:
             item['image_url'] = request.build_absolute_uri(item['image'])
 
         return Response(data)
 
-@api_view([ 'POST'])
-@authentication_classes([])
-def createPost(request):
-    print(request)
-    serializer = CommunityPostSerializer(data=request.data)
-    if serializer.is_valid():
-        user = self.request.user
-        user = serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-     
+@api_view(['POST'])
+def createPost(request):
+    try:
+        # Get the image from the request data
+        image = request.data.get('image')
+
+        # Assuming you have other fields like 'title', 'content', etc. in your serializer
+        data = {
+            'title': request.data.get('title'),
+            'content': request.data.get('content'),
+            'image': image.url if image else None,  # Store the image URL if an image is provided
+        }
+
+        serializer = CommunityPostCreateSerializer(data=data)
+
+        if serializer.is_valid():
+            # You can choose to save the image URL here or leave it to the frontend
+            serializer.save()
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def createCommunityPost(request):
-    serializer = CommunityPostSerializer(data=request.data, context={'request': request})
+    try:
+        # You can directly access the image_url from the request data
+        image_url = request.data.get('image_url')
 
-    if serializer.is_valid():
-        serializer.save(user=request.user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Assuming you have other fields like 'title', 'content', etc. in your serializer
+        data = {
+            'title': request.data.get('title'),
+            'content': request.data.get('content'),
+            'image_url': image_url,  # Use the provided image URL
+        }
+
+        serializer = CommunityPostCreateSerializer(data=data, context={'request': request})
+
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+
+            post = serializer.instance  # Get the newly created post
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 
