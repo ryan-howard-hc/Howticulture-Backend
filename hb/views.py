@@ -13,6 +13,7 @@ from .serializers import *
 from corsheaders.middleware import CorsMiddleware
 from django.views.decorators.http import require_POST
 from django.conf import settings 
+from dropbox import Dropbox, files
 
 
 class UserCreateViewSet(APIView):
@@ -71,8 +72,9 @@ class CommunityPostListViewSet(viewsets.ModelViewSet):
         serializer = CommunityPostSerializer(queryset, many=True, context={'request': request})
         data = serializer.data
 
+        # Exclude 'image' field from the response data
         for item in data:
-            item['image_url'] = request.build_absolute_uri(item['image'])
+            item.pop('image', None)
 
         return Response(data)
 
@@ -80,20 +82,16 @@ class CommunityPostListViewSet(viewsets.ModelViewSet):
 @api_view(['POST'])
 def createPost(request):
     try:
-        # Get the image from the request data
-        image = request.data.get('image')
-
-        # Assuming you have other fields like 'title', 'content', etc. in your serializer
         data = {
             'title': request.data.get('title'),
             'content': request.data.get('content'),
-            'image': image.url if image else None,  # Store the image URL if an image is provided
+            'user': None,
+            'image_url': request.data.get('image_url'),  # Include the image URL
         }
 
         serializer = CommunityPostCreateSerializer(data=data)
 
         if serializer.is_valid():
-            # You can choose to save the image URL here or leave it to the frontend
             serializer.save()
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -104,27 +102,34 @@ def createPost(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+def upload_image_to_dropbox(image, filename):
+    access_token = "sl.Bk0Cuvh1AMQUPB6VY62pKD-2NWzkMy3p9c1rpnbtrn9KnTL31knFSQfinkR6aMgodYoqtM2mnAgWL5ULmZKMtEgszTUyXhaKSUpK5qfAq_7XAYvjlzgxbzdQjQYUZKIKNQVd6gZagMpr" 
+
+    dbx = Dropbox(access_token)
+    with image.open('rb') as img_file:
+        dbx.files_upload(img_file.read(), filename, mode=files.WriteMode('overwrite'))
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def createCommunityPost(request):
     try:
-        # You can directly access the image_url from the request data
-        image_url = request.data.get('image_url')
+        title = request.data.get('title')
+        content = request.data.get('content')
+        user_id = request.user.id
+        postId = request.data.get('postId')
+        image_url = request.data.get('image_url')  # Get the image URL from the request
 
-        # Assuming you have other fields like 'title', 'content', etc. in your serializer
-        data = {
-            'title': request.data.get('title'),
-            'content': request.data.get('content'),
-            'image_url': image_url,  # Use the provided image URL
-        }
+        post = CommunityPost(title=title, content=content, user_id=user_id, postId=postId, image_url=image_url)
 
-        serializer = CommunityPostCreateSerializer(data=data, context={'request': request})
+        # Save the post to the database.
+        post.save()
 
-        if serializer.is_valid():
-            serializer.save(user=request.user)
+        # Serialize the post data
+        serializer = CommunityPostCreateSerializer(post, context={'request': request})
 
-            post = serializer.instance  # Get the newly created post
+        # Return the serialized post data in the response
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
