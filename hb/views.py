@@ -79,26 +79,6 @@ class CommunityPostListViewSet(viewsets.ModelViewSet):
         return Response(data)
 
 
-@api_view(['POST'])
-def createPost(request):
-    try:
-        data = {
-            'title': request.data.get('title'),
-            'content': request.data.get('content'),
-            'user': None,
-            'image_url': request.data.get('image_url'),  # Include the image URL
-        }
-
-        serializer = CommunityPostCreateSerializer(data=data)
-
-        if serializer.is_valid():
-            serializer.save()
-
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -117,17 +97,14 @@ def createCommunityPost(request):
         content = request.data.get('content')
         user_id = request.user.id
         postId = request.data.get('postId')
-        image_url = request.data.get('image_url')  # Get the image URL from the request
+        image_url = request.data.get('image_url')  
 
-        post = CommunityPost(title=title, content=content, user_id=user_id, postId=postId, image_url=image_url)
+        post = CommunityPost(title=title, content=content, user_id=user_id, postId=postId, image_url=image_url, poster=poster)
 
-        # Save the post to the database.
         post.save()
 
-        # Serialize the post data
         serializer = CommunityPostCreateSerializer(post, context={'request': request})
 
-        # Return the serialized post data in the response
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     except Exception as e:
