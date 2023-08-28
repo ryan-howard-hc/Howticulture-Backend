@@ -16,14 +16,24 @@ class User(models.Model):
     password = models.CharField(max_length=255)
     date_registered = models.DateTimeField()
 
+
 class UserFavoritePlants(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
- 
+    user = models.ForeignKey(User, on_delete=models.CASCADE) 
+    plant_name = models.CharField(max_length=255)
+
     
 class CommunityPost(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     content = models.TextField()
     postId = models.CharField(max_length=50)
-    image_url = models.URLField(blank=True, null=True)  # Add the image_url field
+    image_url = models.URLField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class UserPost(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=50)
+    content = models.TextField()
+    image_url = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

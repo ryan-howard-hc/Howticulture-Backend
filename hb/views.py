@@ -90,7 +90,7 @@ def upload_image_to_dropbox(image, filename):
         dbx.files_upload(img_file.read(), filename, mode=files.WriteMode('overwrite'))
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([])
 def createCommunityPost(request):
     try:
         title = request.data.get('title')
@@ -112,28 +112,67 @@ def createCommunityPost(request):
 
 
 
-
 @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
 def add_favorite_plant(request):
-    try:
-        user = request.user
-        plant_id = request.data.get('plant_id')  # You need to send the plant_id from the frontend
+    if request.method == 'POST':
+        user=request.data.get("user")
+        plant_name=request.data.get("plant_name")
+        favorite_plant_data = {
+            'user': user,
+            'plant_name': plant_name,
+        }
+        favorites = UserFavoritePlants.objects.filter(user=user, plant_name=plant_name)
+        if not favorites:
+            user_favorite_plant_serializer = UserFavoritePlantsSerializer(data=favorite_plant_data)
+            if user_favorite_plant_serializer.is_valid():
+                user_favorite_plant_serializer.save()
+                return Response({'message': 'Plant added to favorites'}, status=status.HTTP_201_CREATED)
+            return Response(user_favorite_plant_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'Plant already in favorites'}, status=status.HTTP_200_OK)
+    return Response({'message': 'Invalid request method'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-        # Check if the plant already exists in favorites
-        existing_favorite = UserFavoritePlants.objects.filter(user=user, plant_id=plant_id).first()
 
-        if existing_favorite:
-            return Response({"detail": "Plant already in favorites."}, status=status.HTTP_400_BAD_REQUEST)
+    # try:
+    #     user = request.user
+    #     plant_name = request.data.get('plant_name')
 
-        # Create a new UserFavoritePlants entry
-        plant = Plant.objects.get(pk=plant_id)
-        user_favorite_plant = UserFavoritePlants(user=user, plant=plant)
-        user_favorite_plant.save()
+    #     # Check if the plant is already a favorite for the user
+    #     existing_favorite = UserFavoritePlants.objects.filter(user=user, plant_name=plant_name).first()
 
-        return Response({"detail": "Plant added to favorites."}, status=status.HTTP_201_CREATED)
-    except Exception as e:
-        return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    #     if existing_favorite:
+    #         # If the plant is already a favorite, remove it
+    #         existing_favorite.delete()
+    #         message = 'Plant removed from favorites'
+    #         response_status = status.HTTP_200_OK
+    #     else:
+    #         # If the plant is not a favorite, add it to favorites
+    #         user_favorite_plant = UserFavoritePlants(user=user, plant_name=plant_name)
+    #         user_favorite_plant.save()
+    #         message = 'Plant added to favorites'
+    #         response_status = status.HTTP_201_CREATED
+
+    #     return Response({'message': message}, status=response_status)
+    # except Exception as e:
+    #     return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+class UserPostListViewSet(viewsets.ModelViewSet):
+    queryset = UserPost.objects.all()
+    serializer_class = UserPostSerializer
+
+    def list(self, request, user_id):
+        queryset = UserPost.objects.filter(user=user_id)
+        serializer = UserPostSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request, user_id): 
+        serializer = UserPostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=user_id)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['POST'])

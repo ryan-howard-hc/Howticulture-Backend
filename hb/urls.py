@@ -13,6 +13,8 @@ router = routers.DefaultRouter()
 router.register(r'users', UsersViewSet)
 router.register(r'user-favorite-plants', UserFavoritePlantsListViewSet)
 router.register(r'community-posts', CommunityPostListViewSet)
+router.register(r'user-posts', UserPostListViewSet, basename='user-posts') 
+
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -22,12 +24,15 @@ urlpatterns = [
 
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
 
+    path('add-favorite-plant/',views.add_favorite_plant, name="add_favorite_plant"), 
     path('user-favorite-plants/<int:pk>/', UserFavoritePlantsListViewSet.as_view({'get': 'list'}), name="user_favorite_plants_detail"), 
-    path('user-favorite-plants/<int:pk>/add-favorite-plant/', UserFavoritePlantsListViewSet.as_view({'post': 'add_favorite_plant'}), name="add_favorite_plant"),
+
     path('api/save-slug/', save_slug, name='save_slug'),
+
     path('community-posts/<int:pk>/', CommunityPostListViewSet.as_view({'get':'list'})), 
     path('create-community-posts/',views.createCommunityPost), 
-    
+    path('user-posts/<int:user_id>/', UserPostListViewSet.as_view({'get': 'list', 'post': 'create'}), name="user_posts"),
+
 ]
 
 
