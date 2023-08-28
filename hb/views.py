@@ -115,22 +115,32 @@ def createCommunityPost(request):
 @api_view(['POST'])
 def add_favorite_plant(request):
     if request.method == 'POST':
-        user=request.data.get("user")
-        plant_name=request.data.get("plant_name")
+        user_id = request.data.get("user")
+        plant_name = request.data.get("plant_name")
+        
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            # User does not exist, create a new user
+            user = User.objects.create(pk=user_id)
+        
         favorite_plant_data = {
             'user': user,
             'plant_name': plant_name,
         }
+        
         favorites = UserFavoritePlants.objects.filter(user=user, plant_name=plant_name)
+        
         if not favorites:
             user_favorite_plant_serializer = UserFavoritePlantsSerializer(data=favorite_plant_data)
             if user_favorite_plant_serializer.is_valid():
                 user_favorite_plant_serializer.save()
                 return Response({'message': 'Plant added to favorites'}, status=status.HTTP_201_CREATED)
             return Response(user_favorite_plant_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
         return Response({'message': 'Plant already in favorites'}, status=status.HTTP_200_OK)
+    
     return Response({'message': 'Invalid request method'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
 
     # try:
     #     user = request.user
